@@ -1,84 +1,84 @@
 # Blue3 Start Script
 
-Script inicial para provisionamento manual de servidores Debian.
+Initial script for manual provisioning of Debian servers.
 
-O objetivo deste projeto e padronizar as primeiras configuracoes de um servidor Linux Debian com menu interativo, mantendo log, backup e pontos de ajuste rapido no inicio do script.
+The goal of this project is to standardize the first configurations of a Debian Linux server with an interactive menu, keeping a log, backups and quick-adjustment points at the start of the script.
 
-## 🔄 Antes de comecar: `git pull`
+## 🔄 Before you start: `git pull`
 
-**SEMPRE** verifique atualizacoes remotas antes de escrever ou alterar qualquer coisa neste repositorio:
+**ALWAYS** check for remote updates before writing or changing anything in this repository:
 
 ```bash
-git pull          # ja esta pre-autorizado (allow)
+git pull          # already pre-authorized (allow)
 ```
 
-Trabalhar sobre uma base desatualizada gera conflitos. Puxe primeiro, sempre. Para so inspecionar antes: `git fetch && git status`.
+Working on top of an outdated base causes conflicts. Pull first, always. To just inspect beforehand: `git fetch && git status`.
 
-## Arquivos
+## Files
 
-- `start.sh`: script principal de configuracao inicial
-- `README.md`: documentacao de uso e manutencao
-- `VERSION`: versao local do projeto
-- `.env.example`: modelo de configuracao local para gerar `.env_start`
-- `templates/`: blocos externos usados pelo script
+- `start.sh`: main initial-configuration script
+- `README.md`: usage and maintenance documentation
+- `VERSION`: local project version
+- `.env.example`: local configuration template to generate `.env_start`
+- `templates/`: external blocks used by the script
 
-## O que o script faz
+## What the script does
 
-O menu atual oferece estas etapas:
+The current menu offers these steps:
 
-1. Configurar hostname, `/etc/hosts` e arquivo de rede
-2. Executar `apt update`, `upgrade`, `clean` e `autoremove`
-3. Instalar aplicativos basicos de administracao
-4. Aplicar perfil de VM Proxmox
-5. Aplicar banner BLUE3 no login
-6. Aplicar `.bashrc` BLUE3 para o usuario root
-7. Configurar SSH via `sshd_config.d`
-8. Instalar e configurar sincronismo NTP
-9. Atualizar mirror APT
-A. Agendar regeneracao das host keys SSH no proximo boot
-U. Verificar e aplicar autoatualizacao do projeto via GitHub
-Z. Instalar e configurar Zabbix Agent
+1. Configure hostname, `/etc/hosts` and the network file
+2. Run `apt update`, `upgrade`, `clean` and `autoremove`
+3. Install basic administration applications
+4. Apply the Proxmox VM profile
+5. Apply the BLUE3 login banner
+6. Apply the BLUE3 `.bashrc` for the root user
+7. Configure SSH via `sshd_config.d`
+8. Install and configure NTP synchronization
+9. Update the APT mirror
+A. Schedule regeneration of the SSH host keys on the next boot
+U. Check and apply the project's self-update via GitHub
+Z. Install and configure the Zabbix Agent
 
-## Melhorias aplicadas nesta versao
+## Improvements applied in this version
 
-O script foi reorganizado para corrigir problemas do modelo anterior:
+The script was reorganized to fix problems from the previous model:
 
-- usa `set -Eeuo pipefail`
-- valida root antes de iniciar
-- valida se o sistema e Debian suportado
-- registra execucao em log real com timestamp unico
-- cria backups antes de alterar arquivos criticos
-- usa `sshd -t` antes de reiniciar o SSH
-- remove diretivas obsoletas do OpenSSH
-- evita `sed` agressivo no arquivo principal do SSH
-- reescreve configuracoes criticas com heredoc legivel
-- deixa variaveis sensiveis concentradas no topo do script
-- move blocos grandes para templates externos
-- suporta arquivo `.env_start` local para customizacao do ambiente
-- usa arquivo `VERSION` para controle de versao local
-- prepara autoatualizacao do projeto via GitHub por tarball do repositorio
+- uses `set -Eeuo pipefail`
+- validates root before starting
+- validates that the system is a supported Debian
+- records the run in a real log with a unique timestamp
+- creates backups before changing critical files
+- uses `sshd -t` before restarting SSH
+- removes obsolete OpenSSH directives
+- avoids aggressive `sed` on the main SSH file
+- rewrites critical configurations with a readable heredoc
+- keeps sensitive variables concentrated at the top of the script
+- moves large blocks to external templates
+- supports a local `.env_start` file for environment customization
+- uses a `VERSION` file for local version control
+- prepares the project's self-update via GitHub using a repository tarball
 
-## Controle de versao do projeto
+## Project version control
 
-O projeto agora possui um arquivo dedicado:
+The project now has a dedicated file:
 
 ```text
 VERSION
 ```
 
-Esse arquivo e a fonte da versao local do projeto. O `start.sh` le esse valor na inicializacao e compara com a versao publicada no GitHub quando a rotina de autoatualizacao e executada.
+This file is the source of the project's local version. `start.sh` reads this value at startup and compares it with the version published on GitHub when the self-update routine runs.
 
-Esse modelo e melhor do que deixar a versao apenas dentro do script porque:
+This model is better than keeping the version only inside the script because:
 
-- facilita a manutencao
-- permite comparacao remota simples
-- evita ter que parsear o corpo inteiro do shell script
+- it makes maintenance easier
+- it allows a simple remote comparison
+- it avoids having to parse the entire body of the shell script
 
-## Autoatualizacao via GitHub
+## Self-update via GitHub
 
-O script agora suporta autoatualizacao do projeto usando o repositorio GitHub configurado no `.env_start`.
+The script now supports self-updating the project using the GitHub repository configured in `.env_start`.
 
-Variaveis novas:
+New variables:
 
 ```bash
 UPDATE_REPO_OWNER=samirhvbr
@@ -86,34 +86,34 @@ UPDATE_REPO_NAME=Linux-Start
 UPDATE_REPO_BRANCH=master
 ```
 
-Fluxo da atualizacao:
+Update flow:
 
-1. consulta `VERSION` remoto em `raw.githubusercontent.com`
-2. compara com a versao local usando ordenacao de versao
-3. baixa o tarball do branch configurado se houver versao mais nova
-4. extrai o projeto para uma pasta temporaria
-5. faz backup do projeto atual
-6. sobrescreve os arquivos do projeto local
-7. reinicia o script atualizado
+1. queries the remote `VERSION` at `raw.githubusercontent.com`
+2. compares it with the local version using version ordering
+3. downloads the tarball of the configured branch if there is a newer version
+4. extracts the project to a temporary folder
+5. backs up the current project
+6. overwrites the local project files
+7. restarts the updated script
 
-Backups da autoatualizacao ficam dentro do diretório de backup da execucao atual.
+Self-update backups are kept inside the backup directory of the current run.
 
-## Situacao atual do repositorio remoto
+## Current status of the remote repository
 
-Foi verificado o repositorio:
+The repository was checked:
 
 - `https://github.com/samirhvbr/Linux-Start`
 
-No momento da checagem, o branch `master` ainda estava com a versao antiga do `start.sh` e sem `VERSION` publicado. Entao:
+At the time of the check, the `master` branch still had the old version of `start.sh` and without a published `VERSION`. So:
 
-- o mecanismo novo ja esta pronto localmente
-- ele passa a funcionar de verdade assim que esta nova estrutura for enviada ao GitHub
+- the new mechanism is already ready locally
+- it will actually work as soon as this new structure is pushed to GitHub
 
-Em outras palavras: a melhor pratica foi implementada no projeto local, mas o repositorio remoto ainda precisa receber esses arquivos novos para a autoatualizacao encontrar uma versao remota valida.
+In other words: the best practice was implemented in the local project, but the remote repository still needs to receive these new files for the self-update to find a valid remote version.
 
-## Estrutura de templates
+## Template structure
 
-Os blocos maiores de manutencao foram separados em arquivos dentro de `templates/`:
+The larger maintenance blocks were separated into files inside `templates/`:
 
 - `templates/banner/10-uname.tpl`
 - `templates/banner/20-blue3.tpl`
@@ -122,31 +122,31 @@ Os blocos maiores de manutencao foram separados em arquivos dentro de `templates
 - `templates/ssh/blue3-root-ipath.conf.tpl`
 - `templates/ssh/rhosts.conf.tpl`
 
-Com isso, alteracoes de banner, bashrc e SSH nao precisam mais ser feitas diretamente no corpo do `start.sh`.
+With this, changes to the banner, bashrc and SSH no longer need to be made directly in the body of `start.sh`.
 
-## Uso de .env_start
+## Using .env_start
 
-Sim, usar um arquivo de ambiente aqui faz sentido como boa pratica, desde que ele seja tratado como configuracao local e nao como arquivo versionado com dados sensiveis.
+Yes, using an environment file here makes sense as a good practice, as long as it is treated as local configuration and not as a versioned file with sensitive data.
 
-O script procura automaticamente por:
+The script automatically looks for:
 
 ```bash
 .env_start
 ```
 
-no mesmo diretorio do projeto. Se o arquivo nao existir, ele usa os valores padrao embutidos no script.
+in the project's own directory. If the file does not exist, it uses the default values built into the script.
 
-O fluxo recomendado e:
+The recommended flow is:
 
 ```bash
 cp .env.example .env_start
 ```
 
-Depois disso, ajuste os valores do seu ambiente local.
+After that, adjust the values for your local environment.
 
-## Variaveis de ajuste rapido
+## Quick-adjustment variables
 
-Estas variaveis podem ficar no `.env_start` para facilitar a adaptacao para outros ambientes:
+These variables can go in `.env_start` to make adaptation to other environments easier:
 
 ```bash
 REQUIRED_DEBIAN_MAJOR="${REQUIRED_DEBIAN_MAJOR:-11}"
@@ -161,34 +161,34 @@ UPDATE_REPO_BRANCH="${UPDATE_REPO_BRANCH:-master}"
 ZABBIX_RELEASE_URL="${ZABBIX_RELEASE_URL:-}"
 ```
 
-Essas configuracoes sao carregadas antes das validacoes principais do script.
+These settings are loaded before the script's main validations.
 
-## Logs e backups
+## Logs and backups
 
-Cada execucao cria:
+Each run creates:
 
-- log em `/root/blue3_start_YYYYMMDDHHMMSS.log`
-- backup em `/root/blue3_start_YYYYMMDDHHMMSS/`
+- a log at `/root/blue3_start_YYYYMMDDHHMMSS.log`
+- a backup at `/root/blue3_start_YYYYMMDDHHMMSS/`
 
-Arquivos alterados, como SSH, rede, hosts, MOTD e `.bashrc`, passam a ter backup antes de qualquer sobrescrita.
+Changed files, such as SSH, network, hosts, MOTD and `.bashrc`, are backed up before any overwrite.
 
-## Requisitos
+## Requirements
 
-O script foi preparado para:
+The script was prepared for:
 
-- Debian 11 ou superior
-- execucao como `root`
-- acesso a internet para etapas de pacote e Zabbix
+- Debian 11 or higher
+- running as `root`
+- internet access for the package and Zabbix steps
 
-Comandos esperados no host:
+Commands expected on the host:
 
 ```bash
 apt awk cp cut date getent grep hostname hostnamectl ip mkdir mv ping sed sshd systemctl tee wget
 ```
 
-## Como usar
+## How to use
 
-Para baixar o projeto direto no servidor via Git:
+To download the project directly on the server via Git:
 
 ```bash
 apt update && apt install -y git
@@ -196,101 +196,101 @@ git clone -b master https://github.com/samirhvbr/Linux-Start.git
 cd Linux-Start
 ```
 
-Depois, execute como root:
+Then run as root:
 
 ```bash
 bash start.sh
 ```
 
-Tambem e possivel sobrescrever variaveis no momento da chamada:
+You can also override variables at call time:
 
 ```bash
 DEFAULT_SSH_PORT=2222 DEFAULT_DOMAIN=empresa.local bash start.sh
 ```
 
-Se preferir um arquivo dedicado em outro caminho, tambem e possivel usar:
+If you prefer a dedicated file at another path, you can also use:
 
 ```bash
 BLUE3_ENV_FILE=/caminho/arquivo.env_start bash start.sh
 ```
 
-## Comportamento das funcoes principais
+## Behavior of the main functions
 
 ### Config server
 
-- detecta hostname, dominio, interface padrao e IP atual
-- permite atualizar hostname
-- pode reescrever `/etc/hosts`
-- pode reescrever `/etc/network/interfaces`
-- nao reinicia automaticamente a rede; deixa a revisao final para o operador
+- detects hostname, domain, default interface and current IP
+- allows updating the hostname
+- can rewrite `/etc/hosts`
+- can rewrite `/etc/network/interfaces`
+- does not automatically restart the network; leaves the final review to the operator
 
 ### SSH
 
-- cria arquivos em `/etc/ssh/sshd_config.d/`
-- usa templates do diretorio `templates/ssh/`
-- define `PermitRootLogin no` globalmente
-- libera root apenas para IPs definidos em `Match Address`
-- valida a configuracao com `sshd -t`
-- so reinicia o servico se a validacao passar
+- creates files in `/etc/ssh/sshd_config.d/`
+- uses templates from the `templates/ssh/` directory
+- sets `PermitRootLogin no` globally
+- allows root only for the IPs defined in `Match Address`
+- validates the configuration with `sshd -t`
+- only restarts the service if validation passes
 
-### Perfil Proxmox VM
+### Proxmox VM Profile
 
-- atualiza os indices do APT antes da instalacao
-- instala `qemu-guest-agent`, `rsync`, `nano`, `htop`, `curl`, `wget` e `net-tools`
-- habilita `qemu-guest-agent` imediatamente
-- oferece instalacao opcional de `cloud-init` e `cloud-initramfs-growroot`
-- habilita `fstrim.timer` quando disponivel
-- garante `/root/.ssh` com permissao `700`
-- oferece limpeza opcional de cache, journals antigos e logs rotacionados
-- oferece preparacao opcional para template/clone limpando `machine-id` e estado do `cloud-init`
-- dentro da preparacao para template, oferece remocao opcional das chaves host SSH e pode agendar a regeneracao automatica no proximo boot
+- updates the APT indexes before installation
+- installs `qemu-guest-agent`, `rsync`, `nano`, `htop`, `curl`, `wget` and `net-tools`
+- enables `qemu-guest-agent` immediately
+- offers optional installation of `cloud-init` and `cloud-initramfs-growroot`
+- enables `fstrim.timer` when available
+- ensures `/root/.ssh` with permission `700`
+- offers optional cleanup of cache, old journals and rotated logs
+- offers optional preparation for template/clone by clearing `machine-id` and the `cloud-init` state
+- within the template preparation, offers optional removal of the SSH host keys and can schedule automatic regeneration on the next boot
 
-### Regeneracao de host keys SSH no proximo boot
+### SSH host key regeneration on the next boot
 
-- cria um servico `systemd` `oneshot` para executar apenas uma vez no proximo boot
-- usa `ssh-keygen -A` para recriar apenas as host keys ausentes
-- remove o proprio script e a propria unit depois da execucao
-- e a opcao mais adequada quando a VM sera transformada em template ou quando o clone ainda nao iniciou com identidade definitiva
+- creates a `systemd` `oneshot` service to run only once on the next boot
+- uses `ssh-keygen -A` to recreate only the missing host keys
+- removes its own script and its own unit after running
+- is the most suitable option when the VM will be turned into a template or when the clone has not yet started with a definitive identity
 
-### Banner e bashrc
+### Banner and bashrc
 
-- o banner BLUE3 e aplicado a partir dos templates em `templates/banner/`
-- o `.bashrc` do root e aplicado a partir de `templates/bash/root.bashrc.tpl`
-- ajustes visuais e aliases agora ficam fora do script principal
+- the BLUE3 banner is applied from the templates in `templates/banner/`
+- root's `.bashrc` is applied from `templates/bash/root.bashrc.tpl`
+- visual adjustments and aliases now live outside the main script
 
 ### Zabbix
 
-- tenta instalar `zabbix-agent` pelos repositorios atuais
-- se o pacote nao existir, usa `ZABBIX_RELEASE_URL` quando definido
-- cria configuracao em `zabbix_agentd.d`
-- adiciona user parameters para fail2ban
-- cria override do systemd para permissao do socket do fail2ban quando necessario
+- tries to install `zabbix-agent` from the current repositories
+- if the package does not exist, uses `ZABBIX_RELEASE_URL` when defined
+- creates a configuration in `zabbix_agentd.d`
+- adds user parameters for fail2ban
+- creates a systemd override for the fail2ban socket permission when necessary
 
-### Atualizacao do projeto
+### Project update
 
-- consulta `VERSION` remoto no GitHub
-- baixa o tarball do branch configurado
-- faz backup do projeto antes da substituicao
-- reinicia o script atualizado ao final
+- queries the remote `VERSION` on GitHub
+- downloads the tarball of the configured branch
+- backs up the project before replacement
+- restarts the updated script at the end
 
-## Observacoes importantes
+## Important notes
 
-- o script e interativo; nao foi convertido para modo totalmente nao interativo
-- o `.env_start` e recomendado para defaults locais, mas nao substitui a revisao manual de rede e SSH
-- a autoatualizacao depende de o repositorio remoto conter `VERSION`, `start.sh` e a pasta `templates/`
-- a etapa de rede pode derrubar acesso remoto se aplicada sem revisao
-- a etapa de perfil Proxmox pode limpar `machine-id` se o operador confirmar preparacao para template
-- a regeneracao agendada de host keys SSH so deve ser usada quando a identidade SSH atual puder ser descartada com seguranca
-- a etapa de SSH altera politica de acesso root e porta; deve ser testada com cuidado
-- o script assume uso de `ifupdown` em `/etc/network/interfaces`
-- para servidores com `cloud-init`, `NetworkManager` ou `systemd-networkd`, a etapa de rede deve ser revisada antes do uso
+- the script is interactive; it was not converted to a fully non-interactive mode
+- `.env_start` is recommended for local defaults, but does not replace the manual review of network and SSH
+- self-update depends on the remote repository containing `VERSION`, `start.sh` and the `templates/` folder
+- the network step can drop remote access if applied without review
+- the Proxmox profile step can clear `machine-id` if the operator confirms preparation for a template
+- the scheduled regeneration of SSH host keys should only be used when the current SSH identity can be safely discarded
+- the SSH step changes the root access policy and port; it should be tested carefully
+- the script assumes the use of `ifupdown` in `/etc/network/interfaces`
+- for servers with `cloud-init`, `NetworkManager` or `systemd-networkd`, the network step should be reviewed before use
 
-## Proximos passos recomendados
+## Recommended next steps
 
-Melhorias naturais para fases futuras:
+Natural improvements for future phases:
 
-1. criar modo nao interativo por variaveis ou arquivo `.env_start`
-2. separar blocos grandes em arquivos de template
-3. adicionar validacao de IP, CIDR e porta antes de escrever configuracoes
-4. incluir testes de sintaxe automatizados no projeto
-5. adicionar opcao para aplicar configuracoes em lote
+1. create a non-interactive mode via variables or a `.env_start` file
+2. separate large blocks into template files
+3. add validation of IP, CIDR and port before writing configurations
+4. include automated syntax tests in the project
+5. add an option to apply configurations in batch
