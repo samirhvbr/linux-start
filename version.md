@@ -1,6 +1,6 @@
 # Versão — LINUX-START
 
-**Versão atual:** `0.1.4`
+**Versão atual:** `0.1.5`
 
 Script de provisionamento manual inicial de servidores Debian.
 
